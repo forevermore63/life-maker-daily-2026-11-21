@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Maker Profit Monitor — 21 Nov 2026 — Endless Money Pool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e17; color: #e8f0ff; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a2332 0%, #0d1b2a 100%); padding: 1.5rem 2rem; border-bottom: 2px solid #00d4aa; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.logo { font-size: 1.7rem; font-weight: 700; color: #00d4aa; }
+.subtitle { font-size: 0.85rem; opacity: 0.75; }
+.controls { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+.btn { background: #00d4aa; color: #0a0e17; border: none; padding: 0.65rem 1.3rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn:hover { background: #00b894; transform: translateY(-1px); }
+.btn-secondary { background: #1e2a3a; color: #00d4aa; border: 1px solid #00d4aa; }
+.container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+.card { background: #121826; border: 1px solid #1e2a3a; border-radius: 12px; padding: 1.2rem; }
+.card h3 { font-size: 0.85rem; color: #8892a6; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.metric { font-size: 2rem; font-weight: 700; color: #00d4aa; }
+.change { font-size: 0.85rem; margin-top: 0.3rem; }
+.change.up { color: #00d4aa; }
+.chart-container { background: #121826; border-radius: 12px; padding: 1.2rem; margin-bottom: 1.5rem; height: 340px; }
+.apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+.app-card { background: #121826; border: 1px solid #1e2a3a; border-radius: 12px; padding: 1.2rem; transition: all 0.2s; }
+.app-card:hover { border-color: #00d4aa; transform: translateY(-2px); }
+.app-card h4 { color: #00d4aa; margin-bottom: 0.4rem; }
+.app-card .status { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: #1a3a2a; color: #00d4aa; display: inline-block; margin-top: 0.4rem; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; }
+.modal.active { display: flex; }
+.modal-content { background: #121826; border-radius: 16px; padding: 2rem; max-width: 640px; width: 92%; max-height: 85vh; overflow-y: auto; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.4rem; color: #8892a6; font-size: 0.85rem; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; background: #0a0e17; border: 1px solid #1e2a3a; border-radius: 8px; color: #e8f0ff; }
+.toggles { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+.toggle { padding: 0.45rem 0.9rem; border-radius: 20px; background: #1e2a3a; cursor: pointer; font-size: 0.8rem; user-select: none; }
+.toggle.active { background: #00d4aa; color: #0a0e17; }
+.campaign-push { background: #1a2a1a; border: 1px solid #00d4aa; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.85rem; }
+.slider-group { margin: 0.8rem 0; }
+.slider-group label { display: flex; justify-content: space-between; font-size: 0.85rem; color: #8892a6; }
+input[type=range] { width: 100%; accent-color: #00d4aa; }
+.note { font-size: 0.8rem; color: #8892a6; margin-top: 0.5rem; }
+.feel-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="logo">Life Maker Profit Monitor</div>
+    <div class="subtitle">21 November 2026 · Sausage Therapy · Noosa Dachshunds · Forevermore · Pure & Peaceful Balance · Endless Money Pool · Real AUD into CommBank</div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-secondary" onclick="openRevenueModal()">Add Real Revenue</button>
+    <button class="btn btn-secondary" onclick="exportData()">Export Ledger</button>
+    <button class="btn" onclick="openCampaignModal()">Push Paid Campaign</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="grid" id="metrics"></div>
+  <div class="chart-container">
+    <canvas id="revenueChart"></canvas>
+  </div>
+  <h2 style="margin: 1.5rem 0 1rem; color: #00d4aa;">10 Daily Passive Income Engines — Real Money Ready</h2>
+  <div class="apps-grid" id="appsGrid"></div>
+</div>
+
+<div class="modal" id="campaignModal">
+  <div class="modal-content">
+    <h2 style="margin-bottom: 1rem; color: #00d4aa;">Push Paid Marketing Campaign</h2>
+    <div class="form-group">
+      <label>Campaign Name</label>
+      <input type="text" id="campName" value="Sausage Therapy Awareness Surge — Peaceful Balance 21 Nov">
+    </div>
+    <div class="form-group">
+      <label>Platform</label>
+      <select id="campPlatform">
+        <option>Meta Ads (Facebook/Instagram)</option>
+        <option>Google Ads</option>
+        <option>TikTok Ads</option>
+        <option>X / Twitter Ads</option>
+        <option>YouTube Ads</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Daily Budget (AUD)</label>
+      <input type="number" id="campBudget" value="50" min="5">
+    </div>
+    <div class="slider-group">
+      <label>Human Feel Optimisation Score <span id="feelScore">8.7</span></label>
+      <input type="range" id="feelSlider" min="1" max="10" step="0.1" value="8.7" oninput="document.getElementById('feelScore').textContent = this.value">
+    </div>
+    <div class="feel-panel">
+      <div class="slider-group"><label>Peace <span id="peaceVal">80</span></label><input type="range" min="0" max="100" value="80" oninput="document.getElementById('peaceVal').textContent=this.value"></div>
+      <div class="slider-group"><label>Energy <span id="energyVal">65</span></label><input type="range" min="0" max="100" value="65" oninput="document.getElementById('energyVal').textContent=this.value"></div>
+      <div class="slider-group"><label>Purity <span id="purityVal">90</span></label><input type="range" min="0" max="100" value="90" oninput="document.getElementById('purityVal').textContent=this.value"></div>
+      <div class="slider-group"><label>Balance <span id="balanceVal">75</span></label><input type="range" min="0" max="100" value="75" oninput="document.getElementById('balanceVal').textContent=this.value"></div>
+    </div>
+    <div class="form-group">
+      <label>Target Human Feel</label>
+      <div class="toggles" id="feelToggles">
+        <span class="toggle active" data-feel="peace">Peace & Calm</span>
+        <span class="toggle" data-feel="joy">Joy with Dogs</span>
+        <span class="toggle" data-feel="healing">Healing & Recovery</span>
+        <span class="toggle" data-feel="community">Community & Giving</span>
+        <span class="toggle" data-feel="abundance">Abundance Flow</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Ad Creative Angle</label>
+      <textarea id="campCreative" rows="3">Dachshunds detecting mould & supporting cancer recovery. Real therapy that funds pure peaceful balance for the endless money pool. Sausage Therapy — live now.</textarea>
+    </div>
+    <div class="campaign-push">
+      <strong>Real Integration Path:</strong> Copy the brief and paste into Meta Ads Manager, Google Ads, or TikTok. Log spend and results here. Higher human-feel scores compound better long-term returns and attract aligned buyers. Connect accounts for live tracking.
+    </div>
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+      <button class="btn" onclick="launchCampaign()">Launch & Track</button>
+      <button class="btn btn-secondary" onclick="closeModal('campaignModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="revenueModal">
+  <div class="modal-content">
+    <h2 style="margin-bottom: 1rem; color: #00d4aa;">Add Real Revenue Entry</h2>
+    <div class="form-group">
+      <label>Source / Engine</label>
+      <select id="revSource">
+        <option>Sausage Therapy Bookings</option>
+        <option>Dachshund Merch Drop</option>
+        <option>Mould Detection Course</option>
+        <option>Therapy Dog Placement Leads</option>
+        <option>Forevermore Farm Retreats</option>
+        <option>Wiener Coaster Digital Pack</option>
+        <option>NDIS Provider Toolkit</option>
+        <option>Cancer Support Community</option>
+        <option>Property Investment Signals</option>
+        <option>Consciousness Guard App</option>
+        <option>Shopify Store Sales</option>
+        <option>Other / Manual</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Amount (AUD)</label>
+      <input type="number" id="revAmount" value="0" step="0.01" min="0">
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="revDate">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="revNotes" rows="2" placeholder="Stripe payout, Shopify sale, Gumroad, booking deposit, CommBank deposit..."></textarea>
+    </div>
+    <div class="note">Entries save locally in your browser and update charts and projections in real time. Export regularly for backup, tax, and CommBank records. Connect Stripe or Shopify webhooks later for automatic logging.</div>
+    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+      <button class="btn" onclick="saveRevenue()">Save Entry</button>
+      <button class="btn btn-secondary" onclick="closeModal('revenueModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const defaultApps = [
+  { name: "Sausage Therapy Bookings", type: "NDIS/Therapy Sessions", potential: 4500, status: "Live Ready", link: "https://calendly.com/", real: 0 },
+  { name: "Dachshund Merch Drop", type: "Print-on-Demand + Digital", potential: 2200, status: "Template", link: "https://www.printful.com/", real: 0 },
+  { name: "Mould Detection Course", type: "Digital Product", potential: 1800, status: "Gumroad", link: "https://gumroad.com/", real: 0 },
+  { name: "Therapy Dog Placement Leads", type: "Lead Gen + Affiliate", potential: 3200, status: "Funnel", link: "https://www.stan.store/", real: 0 },
+  { name: "Forevermore Farm Retreats", type: "Event Bookings", potential: 6000, status: "Calendar", link: "https://calendly.com/", real: 0 },
+  { name: "Wiener Coaster Digital Pack", type: "Templates/Assets", potential: 900, status: "Digital", link: "https://gumroad.com/", real: 0 },
+  { name: "NDIS Provider Toolkit", type: "SaaS Lite Membership", potential: 2800, status: "Subscription", link: "https://stripe.com/", real: 0 },
+  { name: "Cancer Support Community", type: "Paid Membership", potential: 1500, status: "Circle", link: "https://www.circle.so/", real: 0 },
+  { name: "Property Investment Signals", type: "Newsletter + Affiliate", potential: 1100, status: "Beehiiv", link: "https://www.beehiiv.com/", real: 0 },
+  { name: "Consciousness Guard App", type: "AI Tool Subscription", potential: 2400, status: "Micro-SaaS", link: "https://vercel.com/", real: 0 },
+  { name: "Shopify Store Sales", type: "E-commerce (AUD)", potential: 3500, status: "Connected", link: "https://pjrxp1-t0.myshopify.com", real: 0 }
+];
+
+let apps = JSON.parse(localStorage.getItem('lm_apps') || 'null') || defaultApps;
+let revenueEntries = JSON.parse(localStorage.getItem('lm_entries') || '[]');
+let feelScore = parseFloat(localStorage.getItem('lm_feel') || '8.7');
+
+function saveState() {
+  localStorage.setItem('lm_apps', JSON.stringify(apps));
+  localStorage.setItem('lm_entries', JSON.stringify(revenueEntries));
+  localStorage.setItem('lm_feel', feelScore.toString());
+}
+
+function getDailyTotals() {
+  const data = [0,0,0,0,0,0,0];
+  const today = new Date();
+  revenueEntries.forEach(e => {
+    const d = new Date(e.date);
+    const diff = Math.floor((today - d) / (1000*60*60*24));
+    if (diff >= 0 && diff < 7) {
+      data[6 - diff] += parseFloat(e.amount);
+    }
+  });
+  if (revenueEntries.length === 0) {
+    return [0, 0, 0, 0, 0, 0, 0];
+  }
+  return data;
+}
+
+function initMetrics() {
+  const daily = getDailyTotals();
+  const total = daily.reduce((a,b)=>a+b,0);
+  const projected = Math.round(total * 4.3 * (feelScore / 8));
+  const realTotal = revenueEntries.reduce((s,e)=>s+parseFloat(e.amount),0);
+  document.getElementById('metrics').innerHTML = `
+    <div class="card"><h3>Today's Flow</h3><div class="metric">$${daily[6].toFixed(0)}</div><div class="change up">Real logged</div></div>
+    <div class="card"><h3>7-Day Total</h3><div class="metric">$${total.toLocaleString()}</div><div class="change up">Endless pool compounding</div></div>
+    <div class="card"><h3>Monthly Projection</h3><div class="metric">$${projected.toLocaleString()}</div><div class="change up">Feel-optimised</div></div>
+    <div class="card"><h3>All-Time Real</h3><div class="metric">$${realTotal.toFixed(0)}</div><div class="change">${revenueEntries.length} entries</div></div>
+    <div class="card"><h3>Giving Allocation</h3><div class="metric">12%</div><div class="change up">Dogs & healing funded</div></div>
+    <div class="card"><h3>Human Feel Score</h3><div class="metric">${feelScore.toFixed(1)}</div><div class="change up">Peace optimised</div></div>
+  `;
+}
+
+function initApps() {
+  document.getElementById('appsGrid').innerHTML = apps.map((app, i) => `
+    <div class="app-card">
+      <h4>${app.name}</h4>
+      <div>${app.type}</div>
+      <div style="margin: 0.5rem 0; font-size: 1.1rem; color: #00d4aa;">$${app.potential}/mo potential</div>
+      <div style="font-size: 0.9rem;">Real logged: $${app.real.toFixed(0)}</div>
+      <span class="status">${app.status}</span>
+      <div style="margin-top: 0.6rem;"><a href="${app.link}" target="_blank" style="color: #00d4aa; font-size: 0.85rem;">Open platform →</a></div>
+    </div>
+  `).join('');
+}
+
+let chart;
+function initChart() {
+  const daily = getDailyTotals();
+  const data = {
+    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets: [{
+      label: 'Daily Revenue (AUD)',
+      data: daily,
+      borderColor: '#00d4aa',
+      backgroundColor: 'rgba(0,212,170,0.1)',
+      fill: true,
+      tension: 0.4
+    }]
+  };
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#e8f0ff' } } },
+      scales: {
+        x: { ticks: { color: '#8892a6' }, grid: { color: '#1e2a3a' } },
+        y: { ticks: { color: '#8892a6' }, grid: { color: '#1e2a3a' } }
+      }
+    }
+  });
+}
+
+function openCampaignModal() { document.getElementById('campaignModal').classList.add('active'); }
+function openRevenueModal() { 
+  document.getElementById('revDate').valueAsDate = new Date();
+  document.getElementById('revenueModal').classList.add('active'); 
+}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.querySelectorAll('.toggle').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('active'));
+});
+
+function launchCampaign() {
+  const name = document.getElementById('campName').value;
+  const budget = document.getElementById('campBudget').value;
+  const feel = document.getElementById('feelSlider').value;
+  feelScore = parseFloat(feel);
+  saveState();
+  alert(`Campaign "${name}" queued for $${budget}/day with feel score ${feel}. Copy brief into your Ads Manager for live spend. Tracking into the endless money pool.`);
+  closeModal('campaignModal');
+  initMetrics();
+  initChart();
+}
+
+function saveRevenue() {
+  const source = document.getElementById('revSource').value;
+  const amount = parseFloat(document.getElementById('revAmount').value) || 0;
+  const date = document.getElementById('revDate').value;
+  const notes = document.getElementById('revNotes').value;
+  if (amount <= 0 || !date) { alert('Enter amount and date'); return; }
+  revenueEntries.push({ source, amount, date, notes, id: Date.now() });
+  const app = apps.find(a => a.name === source);
+  if (app) app.real += amount;
+  saveState();
+  closeModal('revenueModal');
+  initMetrics();
+  initApps();
+  initChart();
+  alert(`Logged $${amount} from ${source}. Ledger updated. Export for CommBank/tax.`);
+}
+
+function exportData() {
+  const data = { apps, revenueEntries, feelScore, timestamp: new Date().toISOString(), empire: "Sausage Therapy / Forevermore", date: "2026-11-21", abn: "89 696 625 751" };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'life-maker-ledger-2026-11-21.json';
+  a.click();
+}
+
+initMetrics();
+initApps();
+initChart();
+</script>
+</body>
+</html>
